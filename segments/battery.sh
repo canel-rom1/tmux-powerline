@@ -1,17 +1,31 @@
 # LICENSE This code is not under the same license as the rest of the project as it's "stolen". It's cloned from https://github.com/richoH/dotfiles/blob/master/bin/battery and just some modifications are done so it works for my laptop. Check that URL for more recent versions.
 
-TMUX_POWERLINE_SEG_BATTERY_TYPE_DEFAULT="percentage"
+TMUX_POWERLINE_SEG_BATTERY_TYPE_DEFAULT="logo"
 TMUX_POWERLINE_SEG_BATTERY_NUM_HEARTS_DEFAULT=5
 
 HEART_FULL="♥"
 HEART_EMPTY="♡"
 
+TMUX_POWERLINE_SEG_BATTERY_BATT_100=""
+TMUX_POWERLINE_SEG_BATTERY_BATT_75=""
+TMUX_POWERLINE_SEG_BATTERY_BATT_50=""
+TMUX_POWERLINE_SEG_BATTERY_BATT_25=""
+TMUX_POWERLINE_SEG_BATTERY_BATT_0=""
+TMUX_POWERLINE_SEG_BATTERY_LOGO_CHARGING=""
+
 generate_segmentrc() {
 	read -d '' rccontents  << EORC
-# How to display battery remaining. Can be {percentage, cute}.
+# How to display battery remaining. Can be {percentage, cute, logo}.
 export TMUX_POWERLINE_SEG_BATTERY_TYPE="${TMUX_POWERLINE_SEG_BATTERY_TYPE_DEFAULT}"
 # How may hearts to show if cute indicators are used.
 export TMUX_POWERLINE_SEG_BATTERY_NUM_HEARTS="${TMUX_POWERLINE_SEG_BATTERY_NUM_HEARTS_DEFAULT}"
+# Font for the battery of logo type
+export TMUX_POWERLINE_SEG_BATTERY_BATT_100=""
+export TMUX_POWERLINE_SEG_BATTERY_BATT_75=""
+export TMUX_POWERLINE_SEG_BATTERY_BATT_50=""
+export TMUX_POWERLINE_SEG_BATTERY_BATT_25=""
+export TMUX_POWERLINE_SEG_BATTERY_BATT_0=""
+export TMUX_POWERLINE_SEG_BATTERY_LOGO_CHARGING=""
 EORC
 	echo "$rccontents"
 }
@@ -31,6 +45,9 @@ run_segment() {
 			;;
 		"cute")
 			output=$(__cutinate $battery_status)
+			;;
+		"logo")
+			output=$(__logo $battery_status)
 	esac
 	if [ -n "$output" ]; then
 		echo "$output"
@@ -43,6 +60,24 @@ __process_settings() {
 	fi
 	if [ -z "$TMUX_POWERLINE_SEG_BATTERY_NUM_HEARTS" ]; then
 		export TMUX_POWERLINE_SEG_BATTERY_NUM_HEARTS="${TMUX_POWERLINE_SEG_BATTERY_NUM_HEARTS_DEFAULT}"
+	fi
+	if [ -z "$TMUX_POWERLINE_SEG_BATTERY_BATT_100" ]; then
+		export TMUX_POWERLINE_SEG_BATTERY_BATT_100="${TMUX_POWERLINE_SEG_BATTERY_BATT_100}"
+	fi
+	if [ -z "$TMUX_POWERLINE_SEG_BATTERY_BATT_75" ]; then
+		export TMUX_POWERLINE_SEG_BATTERY_BATT_75="${TMUX_POWERLINE_SEG_BATTERY_BATT_75}"
+	fi
+	if [ -z "$TMUX_POWERLINE_SEG_BATTERY_BATT_50" ]; then
+		export TMUX_POWERLINE_SEG_BATTERY_BATT_50="${TMUX_POWERLINE_SEG_BATTERY_BATT_50}"
+	fi
+	if [ -z "$TMUX_POWERLINE_SEG_BATTERY_BATT_25" ]; then
+		export TMUX_POWERLINE_SEG_BATTERY_BATT_25="${TMUX_POWERLINE_SEG_BATTERY_BATT_25}"
+	fi
+	if [ -z "$TMUX_POWERLINE_SEG_BATTERY_BATT_0" ]; then
+		export TMUX_POWERLINE_SEG_BATTERY_BATT_0="${TMUX_POWERLINE_SEG_BATTERY_BATT_0}"
+	fi
+	if [ -z "$TMUX_POWERLINE_SEG_BATTERY_LOGO_CHARGING" ]; then
+		export TMUX_POWERLINE_SEG_BATTERY_LOGO_CHARGING="${TMUX_POWERLINE_SEG_BATTERY_LOGO_CHARGING}"
 	fi
 }
 
@@ -136,6 +171,33 @@ __battery_osx() {
 			echo -n " "
 			perc=$(( $perc + $inc ))
 		done
+	}
+
+	__logo(){
+		perc=$1
+		charge=""
+
+		if [ "$perc" -le 100 -a "$perc" -gt 90 ]; then
+			logo="$TMUX_POWERLINE_SEG_BATTERY_BATT_100"
+		fi
+		if [ "$perc" -le 90 -a "$perc" -gt 75 ]; then
+			logo="$TMUX_POWERLINE_SEG_BATTERY_BATT_75"
+		fi
+		if [ "$perc" -le 75 -a "$perc" -gt 50 ]; then
+			logo="$TMUX_POWERLINE_SEG_BATTERY_BATT_50"
+		fi
+		if [ "$perc" -le 50 -a "$perc" -gt 21 ]; then
+			logo="$TMUX_POWERLINE_SEG_BATTERY_BATT_25"
+		fi
+		if [ "$perc" -le 15 -a "$perc" -gt 0 ]; then
+			logo="$TMUX_POWERLINE_SEG_BATTERY_BATT_0"
+		fi
+		status=$(cat /sys/class/power_supply/BAT0/status)
+		if [[ "$status" != "Discharging" ]]; then
+			charge="$TMUX_POWERLINE_SEG_BATTERY_LOGO_CHARGING  "
+		fi
+
+		echo "${charge}${logo} ${perc}%"
 	}
 
 	__linux_get_bat() {
