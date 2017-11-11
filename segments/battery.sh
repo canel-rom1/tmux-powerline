@@ -177,19 +177,19 @@ __battery_osx() {
 		perc=$1
 		charge=""
 
-		if [ "$perc" -le 100 -a "$perc" -gt 90 ]; then
+		if [ "$perc" -le 100 -a "$perc" -gt 80 ]; then
 			logo="$TMUX_POWERLINE_SEG_BATTERY_BATT_100"
 		fi
-		if [ "$perc" -le 90 -a "$perc" -gt 75 ]; then
+		if [ "$perc" -le 80 -a "$perc" -gt 60 ]; then
 			logo="$TMUX_POWERLINE_SEG_BATTERY_BATT_75"
 		fi
-		if [ "$perc" -le 75 -a "$perc" -gt 50 ]; then
+		if [ "$perc" -le 60 -a "$perc" -gt 40 ]; then
 			logo="$TMUX_POWERLINE_SEG_BATTERY_BATT_50"
 		fi
-		if [ "$perc" -le 50 -a "$perc" -gt 21 ]; then
+		if [ "$perc" -le 40 -a "$perc" -gt 20 ]; then
 			logo="$TMUX_POWERLINE_SEG_BATTERY_BATT_25"
 		fi
-		if [ "$perc" -le 15 -a "$perc" -gt 0 ]; then
+		if [ "$perc" -le 20 -a "$perc" -gt 0 ]; then
 			logo="$TMUX_POWERLINE_SEG_BATTERY_BATT_0"
 		fi
 		status=$(cat /sys/class/power_supply/BAT0/status)
