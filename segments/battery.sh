@@ -197,7 +197,7 @@ __battery_osx() {
 			charge="$TMUX_POWERLINE_SEG_BATTERY_LOGO_CHARGING  "
 		fi
 
-		echo "${charge}${logo} ${perc}%"
+		echo " ${charge}${logo} ${perc}%"
 	}
 
 	__linux_get_bat() {
